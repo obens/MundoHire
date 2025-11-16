@@ -1,61 +1,37 @@
 "use client";
-import { useState } from "react";
-
-export type Job = {
-  postedAt: string;
-  locationRestriction: string;
-  company: string;
-  title: string;
-  salary: string;
-  applyMethod: string;
-  workType: string;
-  region: string;
-  jobType: string;
-};
-
-const jobs: Job[] = [
-  {
-    postedAt: "2 hours ago",
-    locationRestriction: "remote - United States only",
-    company: "Growmark",
-    title: "Remote Sales Coordinator (Agri-Products)",
-    salary: "15 - 35 USD/hour",
-    applyMethod: "Quick apply",
-    workType: "Remote",
-    region: "United States only",
-    jobType: "Part-time",
-  },
-  {
-    postedAt: "4 hours ago",
-    locationRestriction: "remote - Canada only",
-    company: "Pole air Aviation",
-    title: "Charter Sales Executive",
-    salary: "15 - 50 CAD/hour",
-    applyMethod: "Quick apply",
-    workType: "Remote",
-    region: "Canada only",
-    jobType: "Part-time",
-  },
-  {
-    postedAt: "4 hours ago",
-    locationRestriction: "remote - United States only",
-    company: "TextNow",
-    title: "Sales Manager",
-    salary: "18 - 37 USD/hour",
-    applyMethod: "Quick apply",
-    workType: "Remote",
-    region: "United States only",
-    jobType: "Part-time",
-  },
-];
+import { Job } from "@/app/api/jobs/route";
+import { useEffect, useState } from "react";
 
 export default function JobList() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [jobs, setJobs] = useState<Job[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadJobs() {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs`);
+        if (!res.ok) throw new Error("Erro ao buscar vagas");
+        const data: Job[] = await res.json();
+        setJobs(data);
+      } catch (err: any) {
+        setError(err.message || "Erro inesperado");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadJobs();
+  }, []);
+
+  if (loading) return <p className="p-4 text-gray-600">Carregando vagas...</p>;
+  if (error) return <p className="p-4 text-red-500">⚠️ {error}</p>;
 
   return (
     <div className="w-full bg-gray-100">
       <div className="w-full max-w-[80%] mx-auto my-16">
-        {jobs.map((job, index) => (
+        {jobs?.map((job, index) => (
           <div key={index} className=" bg-white rounded-3xl p-8 mb-8">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-gray-500">{job.postedAt}</span>
