@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 export type Job = {
@@ -110,6 +111,8 @@ export default function JobList() {
   const [regionFilter, setRegionFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
 
+  const router = useRouter();
+
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
       const matchesSearch =
@@ -118,9 +121,7 @@ export default function JobList() {
         job.tags.some((tag) =>
           tag.toLowerCase().includes(searchTerm.toLowerCase())
         );
-      const matchesRegion = regionFilter
-        ? job.region === regionFilter
-        : true;
+      const matchesRegion = regionFilter ? job.region === regionFilter : true;
       const matchesType = typeFilter ? job.jobType === typeFilter : true;
 
       return matchesSearch && matchesRegion && matchesType;
@@ -148,14 +149,17 @@ export default function JobList() {
               Vagas selecionadas para talentos internacionais
             </h2>
             <p className="text-sm text-slate-600">
-              Aplicações rápidas, suporte multilíngue e empresas que já receberam
-              gente do mundo todo.
+              Aplicações rápidas, suporte multilíngue e empresas que já
+              receberam gente do mundo todo.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               className="inline-flex w-full cursor-pointer items-center justify-center rounded-full border border-slate-900 bg-slate-900 px-5 py-3 text-sm font-bold uppercase tracking-[0.3em] text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 md:w-auto"
+              onClick={() => {
+                router.push("/publish");
+              }}
             >
               Publicar vaga
             </button>
@@ -289,7 +293,9 @@ export default function JobList() {
             >
               {selectedJob.title}
             </h3>
-            <p className="text-sm font-semibold text-slate-500">{selectedJob.company}</p>
+            <p className="text-sm font-semibold text-slate-500">
+              {selectedJob.company}
+            </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <div>
                 <p className="text-xs uppercase tracking-[0.4em] text-slate-400">
